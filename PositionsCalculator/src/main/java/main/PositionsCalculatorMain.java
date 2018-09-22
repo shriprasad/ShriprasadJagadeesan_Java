@@ -3,9 +3,6 @@ package main;
 import helpers.PositionsCalculatorHelper;
 import model.TradePosition;
 import org.apache.log4j.Logger;
-import parsers.InputParser;
-import parsers.OutputWriter;
-import parsers.TransactionParser;
 import transaction.TransactionsManager;
 import util.FileUtil;
 
@@ -19,53 +16,49 @@ import java.util.Map;
 public class PositionsCalculatorMain {
 
 
-    static Logger logger=Logger.getLogger(PositionsCalculatorMain.class.getName());
-    static  PositionsCalculatorHelper helper =new PositionsCalculatorHelper();
+    static Logger logger = Logger.getLogger(PositionsCalculatorMain.class.getName());
+    static PositionsCalculatorHelper helper = new PositionsCalculatorHelper();
 
 
     public static void main(String[] args) {
         try {
-
-            Map<String, List<TradePosition>> map =   new PositionsCalculatorMain().run();
-            logger.info(String.valueOf(helper.getMaxVolumeTransactionInstrument(map).get()));
-            logger.info(String.valueOf( helper.getMinVolumeTransactionInstrument(map).get()));
-
+            Map<String, List<TradePosition>> map = new PositionsCalculatorMain().run();
         } catch (IOException e) {
-            logger.error("Could not finish transaction.Process terminated abruptly.",e);
+            logger.error("Could not finish transaction.Process terminated abruptly.", e);
         }
     }
 
 
-
-    public   Map<String, List<TradePosition>> run() throws IOException {
-
-       Map<String, List<TradePosition>> updatedEndOfDayPositions=null;
-        try
-        {
-            Map<String, List<TradePosition>> startOfTheDayPositions= getInput();
-            updatedEndOfDayPositions= processTransactions(startOfTheDayPositions);
-            writeOutputToFile(updatedEndOfDayPositions);
-
-         } catch (IOException e) {
-            logger.error("probelm with parsing input/output from file",e);
+    public Map<String, List<TradePosition>> run() throws IOException {
+        Map<String, List<TradePosition>> EndOfDayPositions = null;
+        try {
+                 EndOfDayPositions = processTransactions(getInputPositions());
+                 writeOutputToFile(EndOfDayPositions);
+                 printQueryResults(EndOfDayPositions);
+        }
+        catch (IOException e) {
+            logger.error("probelm with parsing input/output from file", e);
             throw e;
         }
+        return EndOfDayPositions;
+    }
 
-        return updatedEndOfDayPositions;
+    private Map<String, List<TradePosition>> getInputPositions() throws IOException {
+        return helper.getStartofDayPositions(FileUtil.getInputPath());
+    }
+
+    private void printQueryResults(Map<String, List<TradePosition>> updatedEndOfDayPositions) {
+        logger.info(helper.getMaxVolumeTransactionInstrument(updatedEndOfDayPositions));
+        logger.info(helper.getMinVolumeTransactionInstrument(updatedEndOfDayPositions));
     }
 
     private Map<String, List<TradePosition>> processTransactions(Map<String, List<TradePosition>> startOfTheDayPositions) throws IOException {
-        return ((TransactionParser<Map<String, List<TradePosition>>, IOException>)TransactionsManager::parse).parse(startOfTheDayPositions,FileUtil.transactionsFile());
+        return TransactionsManager.parse(startOfTheDayPositions, FileUtil.transactionsFile());
     }
 
     private boolean writeOutputToFile(Map<String, List<TradePosition>> updatedEndOfDayPositions) throws IOException {
-        return ((OutputWriter<Map<String, List<TradePosition>>, IOException> ) helper::writeEndOfDayPositionsToFile).write(updatedEndOfDayPositions, FileUtil.outputFile());
+        return helper.writeEndOfDayPositionsToFile(updatedEndOfDayPositions, FileUtil.outputFile());
     }
 
-
-    private Map<String, List<TradePosition>>  getInput() throws IOException {
-        return ((InputParser< Map<String, List<TradePosition>>,IOException>)helper::getStartofDayPositions).parse(FileUtil.getInputPath());
-
-    }
 
 }

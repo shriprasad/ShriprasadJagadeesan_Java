@@ -2,13 +2,12 @@ package main;
 
 import helpers.PositionsCalculatorHelper;
 import model.TradePosition;
-import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
-import parsers.InputParser;
-import parsers.OutputWriter;
-import parsers.TransactionParser;
+import parser.InputParser;
+import parser.TransactionParser;
 import transaction.TransactionsManager;
+import util.FileUtil;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -23,8 +22,6 @@ import java.util.stream.Collectors;
 public class PositionCalculatorTest
 
 {
-    static Logger logger=Logger.getLogger(PositionCalculatorTest.class.getName());
-
     PositionsCalculatorHelper helper ;
     String startofDayPosFileLoc;
     String startofDayPosWithError;
@@ -36,18 +33,18 @@ public class PositionCalculatorTest
  public void setup()
  {
      helper =new PositionsCalculatorHelper();
-     transactionFilePath=this.getClass().getResource("/Input_Transactions.txt").getPath();
-     startofDayPosFileLoc =this.getClass().getResource("/startofDayPositionsTestInput").getPath();
+     startofDayPosFileLoc =this.getClass().getResource("/Input_StartOfDay_Positions.txt").getPath();
      startofDayPosWithError =this.getClass().getResource("/ErroneousInput").getPath();
      outputPath=this.getClass().getResource("/testOutput.txt").getPath();
-     expectedOutputPath=this.getClass().getResource("/Expected_EndOfDay_Positions").getPath();
+     expectedOutputPath=this.getClass().getResource("/Expected_end_of_day").getPath();
+     transactionFilePath=this.getClass().getResource("/Input_Transactions.txt").getPath();
      System.out.println(startofDayPosFileLoc);
  }
 
 @Test
 public void test_StartOfTheDayPosition_With_Expectation() throws IOException {
 
-    Map<String,List<TradePosition>> resultmap=  getInput();
+    Map<String,List<TradePosition>> resultmap=  getTestInput();
 
     Map<String,List<TradePosition>> expectedmap=getExpectedStartOfDayPositionMap();
 
@@ -68,7 +65,7 @@ public void test_Exception_StartOfTheDayPosition_With_Expectation() throws IOExc
 @Test
  public void test_TransactionParser_With_ExpectedOutput() throws IOException
 {
-        Map<String,List<TradePosition>> input=  getInput();
+        Map<String,List<TradePosition>> input=  getTestInput();
         Map<String,List<TradePosition>> output=processTransactions(input);
         Map<String,List<TradePosition>> expectedOuptut=getExpectedEndofDayPositions(expectedOutputPath);
 
@@ -81,7 +78,6 @@ public void test_Exception_StartOfTheDayPosition_With_Expectation() throws IOExc
     {
         Map<String, List<TradePosition>> map = null;
         try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
-
             map = reader.lines()
                     .skip(1)// skip the header of the csv
                     .map(mapInputLineToTradePosition())
@@ -109,44 +105,28 @@ public void test_Exception_StartOfTheDayPosition_With_Expectation() throws IOExc
         return ((TransactionParser<Map<String, List<TradePosition>>, IOException>) TransactionsManager::parse).parse(startOfTheDayPositions,transactionFilePath);
     }
 
-    private boolean writeOutputToFile(Map<String, List<TradePosition>> updatedEndOfDayPositions) throws IOException {
-        return ((OutputWriter<Map<String, List<TradePosition>>, IOException>) helper::writeEndOfDayPositionsToFile).write(updatedEndOfDayPositions,outputPath);
-    }
 
 
-    private Map<String, List<TradePosition>>  getInput() throws IOException {
-        return ((InputParser< Map<String, List<TradePosition>>,IOException>)helper::getStartofDayPositions).parse(startofDayPosFileLoc);
+
+    private Map<String, List<TradePosition>> getTestInput() throws IOException {
+            return ((InputParser< Map<String, List<TradePosition>>,IOException>)helper::getStartofDayPositions).parse(FileUtil.getInputPath());
 
     }
-
-
-
-
-    private boolean checkIfEndOfDayPositionsOutputInFile(Map<String, List<TradePosition>> map) {
-return false;
-
-    }
-
-    private boolean checkIfEndOfDayPositionsAreCorrect(Map<String, List<TradePosition>> map) {
-        return false;
-    }
-
-
 
 
 
     public LinkedHashMap<String, List<TradePosition>> getExpectedStartOfDayPositionMap() {
         ArrayList<TradePosition> list=new ArrayList<>();
-        list.add(new TradePosition("IBM","1001","E","10000"));
-        list.add(new TradePosition("IBM","2001","I","-10000"));
-        list.add(new TradePosition("MSFT","1001","E","500000"));
-        list.add(new TradePosition("MSFT","2001","I","-500000"));
-        list.add(new TradePosition("APPL","1001","E","1000"));
-        list.add(new TradePosition("APPL","2001","I","-1000"));
-        list.add(new TradePosition("AMZN","1001","E","-1000"));
-        list.add(new TradePosition("AMZN","2001","I","1000"));
-        list.add(new TradePosition("NFLX","1001","E","10000000"));
-        list.add(new TradePosition("NFLX","2001","I","-10000000"));
+        list.add(new TradePosition("IBM","101","E","100000"));
+        list.add(new TradePosition("IBM","201","I","-100000"));
+        list.add(new TradePosition("MSFT","101","E","5000000"));
+        list.add(new TradePosition("MSFT","201","I","-5000000"));
+        list.add(new TradePosition("APPL","101","E","10000"));
+        list.add(new TradePosition("APPL","201","I","-10000"));
+        list.add(new TradePosition("AMZN","101","E","-10000"));
+        list.add(new TradePosition("AMZN","201","I","10000"));
+        list.add(new TradePosition("NFLX","101","E","100000000"));
+        list.add(new TradePosition("NFLX","201","I","-100000000"));
      return   list.stream().collect(Collectors.groupingBy(TradePosition::getInstrument,LinkedHashMap::new,Collectors.toList()
         ));
    }

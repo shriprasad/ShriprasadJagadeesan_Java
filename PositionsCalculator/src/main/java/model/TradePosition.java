@@ -77,7 +77,7 @@ final public class TradePosition {
 
     @Override
     public String toString() {
-        return System.lineSeparator()+instrument + "," +account +"," + accountType +"," + quantity +","+ delta ;
+        return instrument + "," +account +"," + accountType +"," + quantity +","+ delta ;
     }
 
 

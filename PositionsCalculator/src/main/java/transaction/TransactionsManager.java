@@ -45,7 +45,7 @@ public class TransactionsManager {
             }
         }
         catch (JsonParseException e) {
-            logger.error("pROBLM IN PARSING TRANSACTION FILE",e);
+            logger.error("Problem parsing the JSON transaction input File",e);
             throw e;
         }
         catch (IOException e)
