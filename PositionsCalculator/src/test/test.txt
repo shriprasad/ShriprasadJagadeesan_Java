@@ -1,0 +1,10 @@
+list.add(new TradePosition("IBM","101","E","100000"));
+list.add(new TradePosition("IBM","201","I","-100000"));
+list.add(new TradePosition("MSFT","101","E","5000000"));
+list.add(new TradePosition("MSFT","201","I","-5000000"));
+list.add(new TradePosition("APPL","101","E","10000"));
+list.add(new TradePosition("APPL","201","I","-10000"));
+list.add(new TradePosition("AMZN","101","E","-10000"));
+list.add(new TradePosition("AMZN","201","I","10000"));
+list.add(new TradePosition("NFLX","101","E","100000000"));
+list.add(new TradePosition("NFLX","201","I","-100000000"));
