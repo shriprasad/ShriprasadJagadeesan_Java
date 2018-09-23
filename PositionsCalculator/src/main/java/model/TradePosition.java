@@ -8,6 +8,11 @@ import java.util.Objects;
 final public class TradePosition {
 
     private final String instrument;
+
+    public int getAccount() {
+        return account;
+    }
+
     private   final int account;
 
     @Override

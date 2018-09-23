@@ -4,7 +4,9 @@ import model.TradePosition;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
+import transaction.Transaction;
 import util.FileUtility;
+import util.TransactionsUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,6 +66,23 @@ public void test_StartOfTheDayPosition_With_Expectation() throws IOException {
          assert ( FileUtils.contentEquals(actualOutput,expectedOutput));
    }
 
+   @Test
+    public void test_ApplyTransaction_Matches_Expectation()
+   {
+       TradePosition startPosition=new TradePosition("IBM","101","E","100000");
+       Transaction transaction=new Transaction(1, "IBM", "B",1000);
+
+       TradePosition endPosition= TransactionsUtil.applyTransaction(startPosition,transaction);
+
+       assert (startPosition.getDelta()==0);
+       assert(startPosition.getAccount()==endPosition.getAccount());
+       assert (startPosition.getAccountType()==endPosition.getAccountType());
+       assert(startPosition.getInstrument().equals(endPosition.getInstrument()));
+       assert (Math.abs(endPosition.getQuantity()-startPosition.getQuantity())==Math.abs(endPosition.getDelta()));
+       assert (startPosition.getQuantity()+endPosition.getDelta()==endPosition.getQuantity());
+
+
+   }
 
 
 
