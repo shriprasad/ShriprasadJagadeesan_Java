@@ -9,6 +9,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
+
 /**
  * Created by Prasad on 21-09-2018.
  */
@@ -101,7 +103,7 @@ public class PositionsCalculatorHelper {
                         .skip(1)// skip the header of the csv
                         .map(mapInputLineToTradePosition())
                         .collect( //key-value->Instrument - list of Tradepositions.
-                            Collectors.groupingBy(TradePosition::getInstrument, LinkedHashMap::new, Collectors.toList())
+                            Collectors.groupingBy(TradePosition::getInstrument, LinkedHashMap::new, toList())
                          );
         } catch (IOException e) {
             logger.error( "Exception occured whie reading  start of day positions from file", e);
@@ -122,24 +124,45 @@ public class PositionsCalculatorHelper {
     }
 
 
-    public Optional<TradePosition> getMaxVolumeTransactionInstrument(Map<String, List<TradePosition>> map) {
-    return   map.entrySet()
+    public void printtMaxVolumeTransactionInstruments(Map<String, List<TradePosition>> map) {
+        logger.info("Printing Instruments with maximum transaction volume for the day ::->");
+        long maxDelta = map.entrySet()
                 .stream()
-                .flatMap(entry->entry.getValue().stream())
-                .max(Comparator.comparing(netTransactionVolume()));
+                .flatMap(entry -> entry.getValue().stream())
+                .max(Comparator.comparing(netTransactionVolume())).get().getDelta();
+
+        map.entrySet()
+                .stream()
+                .flatMap(entry -> entry.getValue().stream())
+                .filter(t -> t.getDelta() == maxDelta)
+                .collect(toList())
+                .forEach(logger::info);
+
+
     }
 
     private Function<TradePosition, Long> netTransactionVolume() {
-        return t->Math.abs(t.getDelta());
+        return t -> Math.abs(t.getDelta());
     }
 
 
-    public Optional<TradePosition> getMinVolumeTransactionInstrument(Map<String, List<TradePosition>> map) {
-        return   map.entrySet()
-                    .stream()
-                    .flatMap(entry->entry.getValue()
-                    .stream())
-                     .min(Comparator.comparing(netTransactionVolume()));
+    public void getMinVolumeTransactionInstrument(Map<String, List<TradePosition>> map) {
+
+        logger.info("Printing Instruments with minimum transaction volume for the day ::->");
+        long minDelta = map.entrySet()
+                .stream()
+                .flatMap(entry -> entry.getValue()
+                        .stream())
+                .min(Comparator.comparing(netTransactionVolume())).get()
+                .getDelta();
+
+        map.entrySet()
+                .stream()
+                .flatMap(entry -> entry.getValue().stream())
+                .filter(t -> t.getDelta() == minDelta)
+                .collect(toList())
+                .forEach(logger::info);
+
 
     }
 }
