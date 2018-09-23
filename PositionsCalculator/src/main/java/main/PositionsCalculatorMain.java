@@ -4,7 +4,7 @@ import helpers.PositionsCalculatorHelper;
 import model.TradePosition;
 import org.apache.log4j.Logger;
 import transaction.TransactionsManager;
-import util.FileUtil;
+import util.FileUtility;
 
 import java.io.IOException;
 import java.util.List;
@@ -44,7 +44,7 @@ public class PositionsCalculatorMain {
     }
 
     private Map<String, List<TradePosition>> getInputPositions() throws IOException {
-        return helper.getStartofDayPositions(FileUtil.getInputPath());
+        return helper.getStartofDayPositions(FileUtility.getInputPath());
     }
 
     private void printQueryResults(Map<String, List<TradePosition>> updatedEndOfDayPositions) {
@@ -53,11 +53,11 @@ public class PositionsCalculatorMain {
     }
 
     private Map<String, List<TradePosition>> processTransactions(Map<String, List<TradePosition>> startOfTheDayPositions) throws IOException {
-        return TransactionsManager.parse(startOfTheDayPositions, FileUtil.transactionsFile());
+        return TransactionsManager.processTransactions(startOfTheDayPositions, FileUtility.transactionsFile());
     }
 
     private boolean writeOutputToFile(Map<String, List<TradePosition>> updatedEndOfDayPositions) throws IOException {
-        return helper.writeEndOfDayPositionsToFile(updatedEndOfDayPositions, FileUtil.outputFile());
+        return helper.writeEndOfDayPositionsToFile(updatedEndOfDayPositions, FileUtility.outputFile());
     }
 
 

@@ -104,7 +104,7 @@ public class PositionsCalculatorHelper {
                             Collectors.groupingBy(TradePosition::getInstrument, LinkedHashMap::new, Collectors.toList())
                          );
         } catch (IOException e) {
-            logger.error( "problem reading from input file", e);
+            logger.error( "Exception occured whie reading  start of day positions from file", e);
             throw e;
         }
 

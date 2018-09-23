@@ -32,7 +32,7 @@ public class TransactionsManager {
      * @throws IOException
      */
 
-    public static Map<String, List<TradePosition>> parse(Map<String, List<TradePosition>> map,String inputPath) throws IOException {
+    public static Map<String, List<TradePosition>> processTransactions(Map<String, List<TradePosition>> map, String inputPath) throws IOException {
 
         JsonFactory jfactory = new JsonFactory();
 
