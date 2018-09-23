@@ -134,7 +134,7 @@ public class PositionsCalculatorHelper {
         map.entrySet()
                 .stream()
                 .flatMap(entry -> entry.getValue().stream())
-                .filter(t -> t.getDelta() == maxDelta)
+                .filter(t -> Math.abs(t.getDelta()) == Math.abs(maxDelta))
                 .collect(toList())
                 .forEach(logger::info);
 
@@ -159,7 +159,7 @@ public class PositionsCalculatorHelper {
         map.entrySet()
                 .stream()
                 .flatMap(entry -> entry.getValue().stream())
-                .filter(t -> t.getDelta() == minDelta)
+                .filter(t -> Math.abs(t.getDelta()) == Math.abs(minDelta))
                 .collect(toList())
                 .forEach(logger::info);
 
