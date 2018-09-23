@@ -67,25 +67,46 @@ public void test_StartOfTheDayPosition_With_Expectation() throws IOException {
    }
 
    @Test
-    public void test_ApplyTransaction_Matches_Expectation()
+    public void test_ApplyBuyTransaction()
    {
        TradePosition startPosition=new TradePosition("IBM","101","E","100000");
-       Transaction transaction=new Transaction(1, "IBM", "B",1000);
-
-       TradePosition endPosition= TransactionsUtil.applyTransaction(startPosition,transaction);
-
-       assert (startPosition.getDelta()==0);
-       assert(startPosition.getAccount()==endPosition.getAccount());
-       assert (startPosition.getAccountType()==endPosition.getAccountType());
-       assert(startPosition.getInstrument().equals(endPosition.getInstrument()));
-       assert (Math.abs(endPosition.getQuantity()-startPosition.getQuantity())==Math.abs(endPosition.getDelta()));
+       Transaction buy=new Transaction(1, "IBM", "B",1000);
+       TradePosition endPosition= TransactionsUtil.applyTransaction(startPosition,buy);
+       assertImmutableTradepositionFields(startPosition, endPosition);
+       assert(startPosition.getQuantity()+buy.getTransactionQuantity()==endPosition.getQuantity());//External Buy
        assert (startPosition.getQuantity()+endPosition.getDelta()==endPosition.getQuantity());
-
-
    }
 
+    private void assertImmutableTradepositionFields(TradePosition startPosition, TradePosition endPosition) {
+        assert (startPosition.getDelta()==0);
+        assert(startPosition.getAccount()==endPosition.getAccount());
+        assert (startPosition.getAccountType()==endPosition.getAccountType());
+        assert(startPosition.getInstrument().equals(endPosition.getInstrument()));
+    }
+
+    @Test
+    public void test_ApplySellTransaction()
+    {
+
+        TradePosition startPosition=new TradePosition("IBM","101","I","100000");
+        Transaction sell=new Transaction(1, "IBM", "S",1000);
+        TradePosition endPosition= TransactionsUtil.applyTransaction(startPosition,sell);
+
+        assertImmutableTradepositionFields(startPosition,endPosition);
+        assert(startPosition.getQuantity()+sell.getTransactionQuantity()==endPosition.getQuantity());//Internal account,Sell
+        assert (startPosition.getQuantity()+endPosition.getDelta()==endPosition.getQuantity());
+
+        Transaction buy=new Transaction(1, "IBM", "B",-1000);
+        //TradePosition is an immutable object Startposition remains the same even after transaction has been applied to it.
+        TradePosition newEndPosition= TransactionsUtil.applyTransaction(startPosition,sell);
+        assertImmutableTradepositionFields(startPosition,newEndPosition);
+        assert(startPosition.getQuantity()-buy.getTransactionQuantity()==newEndPosition.getQuantity());//Internal account,Buy
+        assert (startPosition.getQuantity()+newEndPosition.getDelta()==newEndPosition.getQuantity());
 
 
+
+
+    }
 
 
 }

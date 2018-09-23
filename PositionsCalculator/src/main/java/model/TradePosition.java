@@ -5,7 +5,7 @@ import java.util.Objects;
 /**
  * Created by Prasad on 19-09-2018.
  */
-final public class TradePosition {
+ public final class TradePosition {
 
     private final String instrument;
 

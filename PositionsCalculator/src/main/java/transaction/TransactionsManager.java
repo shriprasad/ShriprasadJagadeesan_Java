@@ -23,6 +23,9 @@ public class TransactionsManager {
     static Logger logger=Logger.getLogger(TransactionsManager.class.getName());
 
 
+    private TransactionsManager() {
+    }
+
     /**
      * Lazy read each transaction from  the input  transaction file with JSON Jackson streaming API.
      * For each transaction calculate and update the the start of the day positions.
@@ -31,6 +34,7 @@ public class TransactionsManager {
      * @return
      * @throws IOException
      */
+
 
     public static Map<String, List<TradePosition>> processTransactions(Map<String, List<TradePosition>> map, String inputPath) throws IOException {
 
