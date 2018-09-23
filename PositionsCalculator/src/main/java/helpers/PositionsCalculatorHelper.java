@@ -124,19 +124,22 @@ public class PositionsCalculatorHelper {
     }
 
 
-    public void printtMaxVolumeTransactionInstruments(Map<String, List<TradePosition>> map) {
+    public List<String> printMaxVolumeTransactionInstruments(Map<String, List<TradePosition>> map) {
         logger.info("Printing Instruments with maximum transaction volume for the day ::->");
         long maxDelta = map.entrySet()
                 .stream()
                 .flatMap(entry -> entry.getValue().stream())
                 .max(Comparator.comparing(netTransactionVolume())).get().getDelta();
 
-        map.entrySet()
+       List<String> list=map.entrySet()
                 .stream()
                 .flatMap(entry -> entry.getValue().stream())
                 .filter(t -> Math.abs(t.getDelta()) == Math.abs(maxDelta))
-                .collect(toList())
-                .forEach(logger::info);
+                .map(TradePosition::getInstrument).distinct()
+                .collect(toList());
+
+       logger.info(list);
+       return list;
 
 
     }
@@ -146,7 +149,7 @@ public class PositionsCalculatorHelper {
     }
 
 
-    public void getMinVolumeTransactionInstrument(Map<String, List<TradePosition>> map) {
+    public List<String> getMinVolumeTransactionInstrument(Map<String, List<TradePosition>> map) {
 
         logger.info("Printing Instruments with minimum transaction volume for the day ::->");
         long minDelta = map.entrySet()
@@ -156,13 +159,15 @@ public class PositionsCalculatorHelper {
                 .min(Comparator.comparing(netTransactionVolume())).get()
                 .getDelta();
 
-        map.entrySet()
+     List<String> list=   map.entrySet()
                 .stream()
                 .flatMap(entry -> entry.getValue().stream())
                 .filter(t -> Math.abs(t.getDelta()) == Math.abs(minDelta))
-                .collect(toList())
-                .forEach(logger::info);
+                .map(TradePosition::getInstrument)
+                .distinct()
+                .collect(toList());
 
-
+        logger.info(list);
+         return list;
     }
 }
