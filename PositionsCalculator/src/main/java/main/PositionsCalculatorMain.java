@@ -22,7 +22,7 @@ public class PositionsCalculatorMain {
 
     public static void main(String[] args) {
         try {
-            Map<String, List<TradePosition>> map = new PositionsCalculatorMain().run();
+            new PositionsCalculatorMain().run();
         } catch (IOException e) {
             logger.error("Could not finish transaction.Process terminated abruptly.", e);
         }
@@ -30,17 +30,17 @@ public class PositionsCalculatorMain {
 
 
     public Map<String, List<TradePosition>> run() throws IOException {
-        Map<String, List<TradePosition>> EndOfDayPositions = null;
+        Map<String, List<TradePosition>> endOfDayPositions = null;
         try {
-                 EndOfDayPositions = processTransactions(getInputPositions());
-                 writeOutputToFile(EndOfDayPositions);
-                 printQueryResults(EndOfDayPositions);
+            endOfDayPositions = processTransactions(getInputPositions());
+            writeOutputToFile(endOfDayPositions);
+            printQueryResults(endOfDayPositions);
         }
         catch (IOException e) {
             logger.error("probelm with parsing input/output from file", e);
             throw e;
         }
-        return EndOfDayPositions;
+        return endOfDayPositions;
     }
 
     private Map<String, List<TradePosition>> getInputPositions() throws IOException {
@@ -48,8 +48,8 @@ public class PositionsCalculatorMain {
     }
 
     private void printQueryResults(Map<String, List<TradePosition>> updatedEndOfDayPositions) {
-        logger.info(helper.getMaxVolumeTransactionInstrument(updatedEndOfDayPositions));
-        logger.info(helper.getMinVolumeTransactionInstrument(updatedEndOfDayPositions));
+        helper.printMaxVolumeTransactionInstruments(updatedEndOfDayPositions);
+        helper.getMinVolumeTransactionInstrument(updatedEndOfDayPositions);
     }
 
     private Map<String, List<TradePosition>> processTransactions(Map<String, List<TradePosition>> startOfTheDayPositions) throws IOException {

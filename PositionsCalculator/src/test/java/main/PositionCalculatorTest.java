@@ -61,12 +61,8 @@ public void test_StartOfTheDayPosition_With_Expectation() throws IOException {
          main.run();
          File actualOutput=new File(FileUtility.outputFile());
          File expectedOutput=new File(expectedOutputPath);
-
-       assert ( FileUtils.contentEquals(actualOutput,expectedOutput));
-
-
-
-     }
+         assert ( FileUtils.contentEquals(actualOutput,expectedOutput));
+   }
 
 
 

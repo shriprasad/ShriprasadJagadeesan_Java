@@ -19,26 +19,7 @@ public class PositionsCalculatorHelper {
     private static final java.lang.String COMMA = ",";
     static Logger logger=Logger.getLogger(PositionsCalculatorHelper.class.getName());
 
-    /**
-     *
-     * @param consumer
-     * @param <T>
-     * @param <E>
-     * @return
-     */
-    private  <T, E extends Exception> Consumer<T> consumerWrapper(Consumer<T> consumer) {
 
-        return i -> {
-            try {
-                consumer.accept(i);
-            } catch (Exception ex) {
-
-                logger.error("Consumer wrapper caught ouptut exception",ex);
-                throw ex;
-
-            }
-        };
-    }
 
     /**
      * Write End of day positions to the output file.
@@ -56,7 +37,7 @@ public class PositionsCalculatorHelper {
             endOfDayPositions.entrySet()
                     .stream()
                     .flatMap(entry->entry.getValue().stream())
-                    .forEach(consumerWrapper(writeOutputToFile(writer)));
+                    .forEach(writeOutputToFile(writer));
         }
         catch (IOException e)
         {
@@ -73,7 +54,7 @@ public class PositionsCalculatorHelper {
         writer.write("Instrument,Account,AccountType,Quantity,Delta");
     }
 
-    private static Consumer<TradePosition> writeOutputToFile(BufferedWriter writer) throws IOException {
+    private static Consumer<TradePosition> writeOutputToFile(BufferedWriter writer)  {
         return (TradePosition tradePosition) -> {
             try {
                 writer.newLine();
@@ -99,12 +80,12 @@ public class PositionsCalculatorHelper {
     {
         Map<String, List<TradePosition>> map = null;
         try (BufferedReader reader = new BufferedReader(new FileReader(inputPath))) {
-                map = reader.lines()
-                        .skip(1)// skip the header of the csv
-                        .map(mapInputLineToTradePosition())
-                        .collect( //key-value->Instrument - list of Tradepositions.
+            map = reader.lines()
+                    .skip(1)// skip the header of the csv
+                    .map(mapInputLineToTradePosition())
+                    .collect( //key-value->Instrument - list of Tradepositions.
                             Collectors.groupingBy(TradePosition::getInstrument, LinkedHashMap::new, toList())
-                         );
+                    );
         } catch (IOException e) {
             logger.error( "Exception occured whie reading  start of day positions from file", e);
             throw e;
@@ -131,15 +112,15 @@ public class PositionsCalculatorHelper {
                 .flatMap(entry -> entry.getValue().stream())
                 .max(Comparator.comparing(netTransactionVolume())).get().getDelta();
 
-       List<String> list=map.entrySet()
+        List<String> list=map.entrySet()
                 .stream()
                 .flatMap(entry -> entry.getValue().stream())
                 .filter(t -> Math.abs(t.getDelta()) == Math.abs(maxDelta))
                 .map(TradePosition::getInstrument).distinct()
                 .collect(toList());
 
-       logger.info(list);
-       return list;
+        logger.info(list);
+        return list;
 
 
     }
@@ -159,7 +140,7 @@ public class PositionsCalculatorHelper {
                 .min(Comparator.comparing(netTransactionVolume())).get()
                 .getDelta();
 
-     List<String> list=   map.entrySet()
+        List<String> list=   map.entrySet()
                 .stream()
                 .flatMap(entry -> entry.getValue().stream())
                 .filter(t -> Math.abs(t.getDelta()) == Math.abs(minDelta))
@@ -168,6 +149,6 @@ public class PositionsCalculatorHelper {
                 .collect(toList());
 
         logger.info(list);
-         return list;
+        return list;
     }
 }
